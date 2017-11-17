@@ -55,6 +55,7 @@ class Dictionary:
 
         fd = open(data_folder + idx2word_file, 'rb')
         self.idx2word = pickle.load(fd)
+        fd.close()
 
     def getVocabSize(self):
         return len(self.idx2word)
@@ -78,7 +79,7 @@ class Dictionary:
 
         return bow
 
-    def topAnswers(self, processed_data_file, max_classes=1000):
+    def topAnswers(self, processed_data_file, max_answers=1000):
         answers = defaultdict(int)
 
         with open(processed_data_file, 'r') as csv_data:
@@ -89,7 +90,7 @@ class Dictionary:
         csv_data.close()
 
         sorted_answers = sorted(answers, key=answers.get, reverse=True)
-        self.labels = sorted_answers[0:max_classes]
+        self.labels = sorted_answers[0:max_answers]
 
         for i in range(len(self.labels)):
             self.labels2idx[self.labels[i]] = i
