@@ -74,10 +74,9 @@ class Preprocess:
         writeFile.close()
         return save_variable
 
-    def preprocess(self):
-        if os.path.isfile(data_folder + train_data_write_file) and os.path.isfile(data_folder + test_data_write_file):
+    def preprocess(self, ignore_ex_check = False):
+        if ignore_ex_check and os.path.isfile(data_folder + train_data_write_file) and os.path.isfile(data_folder + test_data_write_file):
             return
 
         self.train_data = self.preprocessData(self.q_data_train, self.a_data_train, data_folder + train_data_write_file)
         self.test_data = self.preprocessData(self.q_data_test, self.a_data_test, data_folder + test_data_write_file)
-
