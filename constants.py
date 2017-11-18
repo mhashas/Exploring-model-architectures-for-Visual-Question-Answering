@@ -17,3 +17,5 @@ test_data_write_file = 'val_data_processed.csv'
 # where the dictionary will be saved
 idx2word_file = 'idx2word'
 word2idx_file = 'word2idx'
+labels2idx_file = 'labels2idx'
+idx2labels_file = 'idx2labels'

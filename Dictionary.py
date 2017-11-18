@@ -11,25 +11,36 @@ class Dictionary:
     word2idx = {}
     idx2word = []
     labels2idx = {}
-    labels = []
+    idx2labels = []
+
     pp_data = None # type: Preprocess
-    max_classes = 1000
+    max_labels = 1000
 
-    def __init__(self, preprocessed_data, max_classes = 1000):
+    oov = '<UNK>'
+
+    def __init__(self, preprocessed_data, max_labels = 1000):
         self.pp_data = preprocessed_data # type: Preprocess
-        self.max_classes = max_classes
+        self.max_labels = max_labels
 
-        if os.path.isfile(data_folder + idx2word_file) and os.path.isfile(data_folder + word2idx_file):
+        if self.dictionariesAreBuilt():
             self.loadDictionaries()
         else:
             self.generateDictionaries(data_folder + train_data_write_file, True)
-        self.topAnswers(data_folder + train_data_write_file)
 
-    def generateDictionaries(self, processed_csv, write_out):
+    def dictionariesAreBuilt(self):
+        return False
+        return os.path.isfile(data_folder + idx2word_file) and os.path.isfile(data_folder + word2idx_file) \
+               and os.path.isfile(data_folder + labels2idx_file) and os.path.isfile(data_folder + idx2labels_file)
+
+    def generateDictionaries(self, processed_csv, save):
         with open(processed_csv, 'r') as csv_data:
             data = csv.reader(csv_data, delimiter=self.pp_data.csv_delimiter)
+            answers = []
+
             for (_, question, answer) in data:
                 words = question + ' ' + answer
+                answers.append(answer)
+
                 for word in re.split(r'[^\w]+', words):
                     lowercase_word = word.lower()
                     if lowercase_word not in self.word2idx:
@@ -39,14 +50,38 @@ class Dictionary:
 
         csv_data.close()
 
-        if write_out:
-            fd = open(data_folder + idx2word_file, 'wb')
-            pickle.dump(self.idx2word, fd)
-            fd.close()
+        labels = defaultdict(int)
+        for answer in answers:
+            labels[answer.lower()] += 1
 
-            fd = open(data_folder + word2idx_file, 'wb')
-            pickle.dump(self.word2idx, fd)
-            fd.close()
+
+        sorted_answers = sorted(labels, key=labels.get, reverse=True)
+        self.idx2labels = sorted_answers[0:self.max_labels - 1]
+        self.idx2labels.append(self.oov) # append out of vocabulary word
+
+        for i in range(len(self.idx2labels)):
+            self.labels2idx[self.idx2labels[i]] = i
+
+        if save:
+            self.saveDictionaries()
+
+
+    def saveDictionaries(self):
+        fd = open(data_folder + idx2word_file, 'wb')
+        pickle.dump(self.idx2word, fd)
+        fd.close()
+
+        fd = open(data_folder + word2idx_file, 'wb')
+        pickle.dump(self.word2idx, fd)
+        fd.close()
+
+        fd = open(data_folder + labels2idx_file, 'wb')
+        pickle.dump(self.labels2idx, fd)
+        fd.close()
+
+        fd = open(data_folder + idx2labels_file, 'wb')
+        pickle.dump(self.idx2labels, fd)
+        fd.close()
 
     def loadDictionaries(self):
         fd = open(data_folder + word2idx_file, 'rb')
@@ -55,6 +90,14 @@ class Dictionary:
 
         fd = open(data_folder + idx2word_file, 'rb')
         self.idx2word = pickle.load(fd)
+        fd.close()
+
+        fd = open(data_folder + idx2labels_file, 'rb')
+        self.idx2labels = pickle.load(fd)
+        fd.close()
+
+        fd = open(data_folder + labels2idx_file, 'rb')
+        self.labels2idx = pickle.load(fd)
         fd.close()
 
     def getVocabSize(self):
@@ -79,7 +122,8 @@ class Dictionary:
 
         return bow
 
-    def topAnswers(self, processed_data_file, max_answers=1000):
+    @staticmethod
+    def getTopAnswersFromFile(self, processed_data_file, max_answers=1000):
         answers = defaultdict(int)
 
         with open(processed_data_file, 'r') as csv_data:
@@ -90,9 +134,4 @@ class Dictionary:
         csv_data.close()
 
         sorted_answers = sorted(answers, key=answers.get, reverse=True)
-        self.labels = sorted_answers[0:max_answers]
-
-        for i in range(len(self.labels)):
-            self.labels2idx[self.labels[i]] = i
-
-        return self.labels2idx
+        return sorted_answers[0:max_answers]
