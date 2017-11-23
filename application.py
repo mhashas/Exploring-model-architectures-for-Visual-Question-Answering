@@ -1,10 +1,21 @@
-from Preprocess import Preprocess
-from Dictionary import Dictionary
+from preprocess import Preprocess
+from dictionary import Dictionary
 from lstm import LSTM
+from keras.models import load_model
+from constants import *
 
 if __name__ == "__main__":
-    preprocess = Preprocess()
-    preprocess.preprocess()
-    dictionary = Dictionary(preprocess)
+    model_exists = 0
+
+    helper = Preprocess()
+    helper.preprocess()
+
+    dictionary = Dictionary(helper)
     lstm = LSTM(dictionary)
-    lstm.train(save=True)
+
+    if (not model_exists):
+        model = lstm.train(save=True)
+    else:
+        model = load_model(model_folder + 'test-saving-model.hdf5')
+    lstm.evaluate(model)
+
