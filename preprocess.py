@@ -21,12 +21,12 @@ class Preprocess:
 
     image_to_visual_feat_mapping = None
     img_features = np.asarray(h5py.File(data_folder + h5_file)['img_features'])
+    image_dimension = None
 
     csv_delimiter = '~'
 
     reader = codecs.getreader("utf-8")
 
-    #TODO Radu add the validation set as well
     def __init__(self):
         with open(data_folder + json_file, 'r') as f:
             self.image_to_visual_feat_mapping = json.load(f)['VQA_imgid2id']
@@ -48,6 +48,8 @@ class Preprocess:
 
         with gzip.GzipFile(data_folder + a_val_data_fie, 'r') as file:
             self.a_data_val = json.load(self.reader(file))
+
+        self.calculateImageDimension()
 
 
     def getFeatures(self, answers):
@@ -92,3 +94,8 @@ class Preprocess:
         self.train_data = self.preprocessData(self.q_data_train, self.a_data_train, data_folder + train_data_write_file)
         self.test_data = self.preprocessData(self.q_data_test, self.a_data_test, data_folder + test_data_write_file)
         self.val_data = self.preprocessData(self.q_data_val, self.a_data_val, data_folder + val_data_write_file)
+
+    def calculateImageDimension(self):
+        result = len(self.img_features[0])
+        self.image_dimension = result
+        return result

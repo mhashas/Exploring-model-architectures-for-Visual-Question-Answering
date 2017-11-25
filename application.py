@@ -11,11 +11,11 @@ if __name__ == "__main__":
     helper.preprocess()
 
     dictionary = Dictionary(helper)
-    lstm = LSTM(dictionary)
+    lstm = LSTM(dictionary, visual_model=True)
 
     if (not model_exists):
         model = lstm.train(save=True)
     else:
-        model = load_model(model_folder + 'test-saving-model.hdf5')
+        model = load_model(model_folder + 'test-saving-model-image-features.hdf5')
     lstm.evaluate(model)
 
