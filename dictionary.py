@@ -105,36 +105,3 @@ class Dictionary:
 
     def getVocabSize(self):
         return len(self.idx2word)
-
-    def getIdx(self, word):
-        word = word.lower()
-        if (word in self.word2idx):
-            return self.word2idx[word]
-        else:
-            return -1
-
-    def getBOW(self, str):
-        bow = np.zeros(self.getVocabSize())
-
-        words = re.split(r'[^\w]+', str)
-
-        for word in words:
-            idx = self.getIdx(word)
-            if idx > -1:
-                bow[idx] += 1
-
-        return bow
-
-    @staticmethod
-    def getTopAnswersFromFile(self, processed_data_file, max_answers=1000):
-        answers = defaultdict(int)
-
-        with open(processed_data_file, 'r') as csv_data:
-            data = csv.reader(csv_data, delimiter=self.pp_data.csv_delimiter)
-            for (_, _, answer) in data:
-                answers[answer.lower()] += 1
-
-        csv_data.close()
-
-        sorted_answers = sorted(answers, key=answers.get, reverse=True)
-        return sorted_answers[0:max_answers]
