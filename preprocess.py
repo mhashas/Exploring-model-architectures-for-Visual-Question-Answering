@@ -20,7 +20,7 @@ class Preprocess:
     val_data = dict()
 
     image_to_visual_feat_mapping = None
-    img_features = np.asarray(h5py.File(data_folder + h5_file)['img_features'])
+    img_features = None
     image_dimension = None
 
     csv_delimiter = '~'
@@ -49,6 +49,7 @@ class Preprocess:
         with gzip.GzipFile(data_folder + a_val_data_fie, 'r') as file:
             self.a_data_val = json.load(self.reader(file))
 
+        self.img_features = np.asarray(h5py.File(data_folder + h5_file)['img_features'])
         self.calculateImageDimension()
 
 
