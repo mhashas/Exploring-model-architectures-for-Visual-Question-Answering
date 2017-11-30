@@ -7,7 +7,6 @@ from keras.layers import Flatten
 from model_base import ModelBase
 
 class BOW(ModelBase):
-    dictionary = dict()
 
     def __init__(self, dictionary : Dictionary, question_maxlen=20, embedding_vector_length=300, visual_model=False):
         super(BOW, self).__init__(dictionary, question_maxlen, embedding_vector_length, visual_model)
@@ -17,7 +16,7 @@ class BOW(ModelBase):
         model = Sequential()
         model.add(Embedding(self.top_words, self.embedding_vector_length, input_length=self.question_maxlen))
         model.add(Flatten())
-        model.add(Dense(Y.shape[1], activation='softmax')) # parameter for number of classes
+        model.add(Dense(self.dictionary.max_labels, activation='softmax')) # parameter for number of classes
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(model.summary())
 
@@ -40,7 +39,7 @@ class BOW(ModelBase):
         TODO RADU: dropout_layers ??
         """
 
-        model.add(Dense(Y.shape[1], activation='softmax'))
+        model.add(Dense(self.dictionary.max_labels, activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(model.summary())
 
