@@ -45,3 +45,7 @@ def prepare_data(file, dictionary : Dictionary, question_max_length=30):
 
 
         return (X_return, X_img_features, Y_return)
+
+
+def analyse_results():
+    return
