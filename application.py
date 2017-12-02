@@ -20,7 +20,7 @@ def train_and_evaluate(args):
               visual_model=args.visual_model)
 
     if (not args.model_name):
-        model, history = lstm.train(save=True)
+        model = lstm.train(save=True)
     else:
         model = load_model(model_folder + args.model_name)
     lstm.evaluate(model)

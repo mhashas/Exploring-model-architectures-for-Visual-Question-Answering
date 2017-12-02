@@ -46,7 +46,7 @@ class ModelBase:
 
         if save:
             self.save_model(model, save_name)
-            np.save()
+            #np.save()
 
         return model, history
 
