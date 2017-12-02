@@ -11,6 +11,7 @@ class ModelBase:
 
     dictionary = dict()
     visual_model = None
+    model_name = None
 
     def __init__(self, dictionary : Dictionary, question_maxlen = 20, embedding_vector_length = 300, visual_model=True):
         self.dictionary = dictionary
@@ -25,44 +26,51 @@ class ModelBase:
     def build_language_model(self, X, Y):
         raise NotImplementedError
 
-    # @re
     def get_model(self, X, Y) -> Sequential:
         if self.visual_model:
             return self.build_visual_model(X,Y)
         else:
             return self.build_language_model(X,Y)
 
-    def train(self, train_data_file=train_data_write_file, return_model=True, save=False, save_name=''):
-        X, X_features, Y = prepare_data(data_folder + train_data_file, self.dictionary, self.question_maxlen)
+    def train(self, train_data_file=train_data_write_file, save=False, save_name=''):
+        save_name = save_name if save_name else self.model_name
+
+        X, X_features, Y, _, _ = prepare_data(data_folder + train_data_file, self.dictionary, self.question_maxlen)
 
         model = self.get_model(X, Y)
 
         if self.visual_model:
-            model.fit([X, X_features], Y, epochs=10, batch_size=64)
+            history = model.fit([X, X_features], Y, epochs=10, batch_size=64)
         else:
-            model.fit(X, Y, epochs=10, batch_size=64)
+            history = model.fit(X, Y, epochs=10, batch_size=64)
 
         if save:
-            self.get_model(model, save_name)
+            self.save_model(model, save_name)
+            np.save()
 
-        if return_model:
-            return model
+        return model, history
 
-    def evaluate(self, model : Sequential, test_data_file=test_data_write_file, analyse_results=True):
-        X, X_features, Y = prepare_data(data_folder + test_data_file, self.dictionary, self.question_maxlen)
+    def evaluate(self, model : Sequential, test_data_file=test_data_write_file, visualize_results=True, save_predictions=True):
+        X, X_features, Y, answers, image_ids = prepare_data(data_folder + test_data_file, self.dictionary, self.question_maxlen)
 
         if self.visual_model:
             scores, acc = model.evaluate([X, X_features], Y)
         else:
             scores, acc = model.evaluate(X, Y)
 
-        if analyse_results:
-            predictions = None
-            if self.visual_model:
-                predictions = model.predict([X, X_features])
-            else:
-                predictions = model.predict(X)
-            # START ANALISING STUFF YO
+        predictions = None
+        if self.visual_model:
+            predictions = model.predict([X, X_features])
+        else:
+            predictions = model.predict(X)
+
+        if save_predictions:
+            np.save(data_folder + predictions_data_file[:predictions_data_file.find(".")], predictions)
+            np.save(data_folder + inputs_data_file[:inputs_data_file.find(".")], X.tolist())
+            np.save(data_folder + answers_data_file[:answers_data_file.find(".")], answers)
+
+        if visualize_results:
+            analyse_results(X.tolist(), predictions, answers, image_ids, model, self.dictionary, acc, self.model_name)
 
     def save_model(self, model : Sequential, model_name):
         model.save(model_folder + model_name, overwrite=True)

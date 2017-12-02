@@ -3,8 +3,43 @@ from dictionary import Dictionary
 from lstm import LSTM
 from keras.models import load_model
 from constants import *
+from utils import *
 from bow import BOW
 import argparse
+import numpy as np
+
+def train_and_evaluate(args):
+    helper = Preprocess()
+    helper.preprocess()
+
+    dictionary = Dictionary(helper, args.max_answers)
+    lstm = LSTM(dictionary, question_maxlen=args.max_question_len, embedding_vector_length=args.embedding_length,
+                visual_model=args.visual_model, lstm_hidden_units=args.lstm_hidden_units, dropout=args.dropout,
+                recurrent_dropout=args.r_dropout, deeper_lstm=args.deep_lstms)
+    bow = BOW(dictionary, question_maxlen=args.max_question_len, embedding_vector_length=args.embedding_length,
+              visual_model=args.visual_model)
+
+    if (not args.model_name):
+        model, history = lstm.train(save=True)
+    else:
+        model = load_model(model_folder + args.model_name)
+    lstm.evaluate(model)
+
+def visualize_errors(args):
+    helper = Preprocess()
+    helper.preprocess()
+
+    dictionary = Dictionary(helper, args.max_answers, args.include_question_mark)
+
+    inputs = np.load(data_folder + inputs_data_file)
+    answers = np.load(data_folder + answers_data_file)
+    predictions = np.load(data_folder + predictions_data_file)
+
+    #hack for now since I didn't save all the correct data during training
+    _, _, _, _, image_ids = prepare_data(data_folder + test_data_write_file, dictionary)
+
+    analyse_results(inputs, predictions, answers, image_ids, None, dictionary, 0, 'tenpulamea')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -20,19 +55,12 @@ if __name__ == "__main__":
     parser.add_argument("--dropout", type=float, default=0.2)
     parser.add_argument("--r_dropout", type=float, default=0.2)
     parser.add_argument("--visual_model", type=bool, default=True)
+    parser.add_argument("--only_analyze", type=bool, default=False)
+    parser.add_argument("--include_question_mark", type=bool, default=False)
 
     args = parser.parse_args()
 
-    helper = Preprocess()
-    helper.preprocess()
-
-    dictionary = Dictionary(helper, args.max_answers)
-    lstm = LSTM(dictionary, question_maxlen=args.max_question_len, embedding_vector_length=args.embedding_length, visual_model=args.visual_model, lstm_hidden_units=args.lstm_hidden_units, dropout=args.dropout, recurrent_dropout=args.r_dropout, deeper_lstm=args.deep_lstms)
-    bow = BOW(dictionary, question_maxlen=args.max_question_len, embedding_vector_length=args.embedding_length, visual_model=args.visual_model)
-
-    if (not args.model_name):
-        model = bow.train(save=True, save_name='refactoring_stuff_bow.hdf5')
+    if args.only_analyze:
+        visualize_errors(args)
     else:
-        model = load_model(model_folder + args['model_name'])
-    bow.evaluate(model)
-
+        train_and_evaluate(args)

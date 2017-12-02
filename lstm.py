@@ -18,6 +18,10 @@ class LSTM(ModelBase):
         self.deeper_lstm = deeper_lstm
         self.dropout = dropout
         self.recurrent_dropout = recurrent_dropout
+        self.model_name = "LSTM-question_maxlen=" + str(question_maxlen) + "-embedd_length=" + str(embedding_vector_length) + "-lstm_hidden_units=" \
+                        + str(lstm_hidden_units) +"-dropout=" + str(dropout) + "-recurrent_dropout=" + str(recurrent_dropout) + "-deeper_lstm=" + str(deeper_lstm) + \
+                          "-visual_model=" + str(visual_model)
+
 
     def build_visual_model(self, X, Y):
         image_model = Sequential()

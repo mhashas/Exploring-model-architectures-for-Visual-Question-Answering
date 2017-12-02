@@ -13,6 +13,10 @@ q_test_data_file = 'vqa_questions_test.gzip'
 q_val_data_file = 'vqa_questions_valid.gzip'
 a_val_data_fie = 'vqa_annotatons_valid.gzip'
 
+predictions_data_file = 'predictions.npy'
+inputs_data_file = 'inputs.npy'
+answers_data_file = 'answers.npy'
+
 # where the preprocessed data will be saved
 train_data_write_file = 'train_data_processed.csv'
 test_data_write_file = 'test_data_processed.csv'

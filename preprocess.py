@@ -75,6 +75,8 @@ class Preprocess:
         for index, question_info in enumerate(q_data['questions']):
             image_id = question_info['image_id']
             question = question_info['question']
+            question = self.format_question(question)
+
             save_variable[image_id] = dict()
             save_variable[image_id]['question'] = question
             save_variable[image_id]['annotations'] = a_data['annotations'][index]
@@ -88,9 +90,8 @@ class Preprocess:
         return save_variable
 
     def preprocess(self):
-        return False
-        if os.path.isfile(data_folder + train_data_write_file) and os.path.isfile(data_folder + test_data_write_file) and os.path.isfile(data_folder + val_data_write_file):
-            return
+        #if os.path.isfile(data_folder + train_data_write_file) and os.path.isfile(data_folder + test_data_write_file) and os.path.isfile(data_folder + val_data_write_file):
+        #    return
 
         self.train_data = self.preprocessData(self.q_data_train, self.a_data_train, data_folder + train_data_write_file)
         self.test_data = self.preprocessData(self.q_data_test, self.a_data_test, data_folder + test_data_write_file)
@@ -100,3 +101,14 @@ class Preprocess:
         result = len(self.img_features[0])
         self.image_dimension = result
         return result
+
+
+    def format_question(self, question):
+        question_len = len(question)
+        question_list = list(question)
+
+        if (question_list[question_len-1] == '?' and question_list[question_len-2] != ' '):
+            question_list[question_len-1] = ' '
+        question_list.append('?')
+
+        return ''.join(question_list)
