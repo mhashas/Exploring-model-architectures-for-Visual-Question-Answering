@@ -42,7 +42,7 @@ class ModelBase:
         model = self.get_model(X, Y)
 
         if self.visual_model:
-            history = model.fit([X, X_features], Y, epochs=1, batch_size=64)
+            history = model.fit([X, X_features], Y, epochs=10, batch_size=64)
         else:
             history = model.fit(X, Y, epochs=10, batch_size=64)
 
@@ -69,10 +69,11 @@ class ModelBase:
             predictions = model.predict(X)
 
         if save_predictions:
-            np.save(data_folder + predictions_data_file[:predictions_data_file.find(".")], predictions)
-            np.save(data_folder + inputs_data_file[:inputs_data_file.find(".")], X.tolist())
-            np.save(data_folder + answers_data_file[:answers_data_file.find(".")], answers)
-            np.save(data_folder + image_ids_data_file[:image_ids_data_file.find(".")], image_ids)
+            model_type = self.model_name.split('-')[0]
+            np.save(data_folder + predictions_data_file + '_' + model_type, predictions)
+            np.save(data_folder + inputs_data_file + '_' + model_type, X.tolist())
+            np.save(data_folder + answers_data_file + '_' + model_type, answers)
+            np.save(data_folder + image_ids_data_file + '_' + model_type, image_ids)
 
         if visualize_results:
             analyse_results(X.tolist(), predictions, answers, image_ids, model, self.dictionary, acc, self.model_name)

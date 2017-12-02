@@ -8,6 +8,7 @@ from bow import BOW
 import argparse
 import numpy as np
 
+
 def train_and_evaluate(args):
     helper = Preprocess()
     helper.preprocess()

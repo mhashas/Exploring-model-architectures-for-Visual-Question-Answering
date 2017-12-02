@@ -10,7 +10,7 @@ class BOW(ModelBase):
 
     def __init__(self, dictionary : Dictionary, question_maxlen=20, embedding_vector_length=300, visual_model=False):
         super(BOW, self).__init__(dictionary, question_maxlen, embedding_vector_length, visual_model)
-        self.model_name = 'BOW-question_maxlen=' + str(question_maxlen) + "-embedd_length=" + str(embedding_vector_length) + "-visual_model=" + str(visual_model)
+        self.model_name = 'bow-question_maxlen=' + str(question_maxlen) + "-embedd_length=" + str(embedding_vector_length) + "-visual_model=" + str(visual_model)
 
 
     def build_language_model(self, X, Y):
