@@ -68,6 +68,7 @@ class ModelBase:
             np.save(data_folder + predictions_data_file[:predictions_data_file.find(".")], predictions)
             np.save(data_folder + inputs_data_file[:inputs_data_file.find(".")], X.tolist())
             np.save(data_folder + answers_data_file[:answers_data_file.find(".")], answers)
+            np.save(data_folder + image_ids_data_file[:image_ids_data_file.find(".")], image_ids)
 
         if visualize_results:
             analyse_results(X.tolist(), predictions, answers, image_ids, model, self.dictionary, acc, self.model_name)

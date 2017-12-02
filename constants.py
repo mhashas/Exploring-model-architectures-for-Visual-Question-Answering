@@ -16,6 +16,7 @@ a_val_data_fie = 'vqa_annotatons_valid.gzip'
 predictions_data_file = 'predictions.npy'
 inputs_data_file = 'inputs.npy'
 answers_data_file = 'answers.npy'
+image_ids_data_file = 'image_ids.npy'
 
 # where the preprocessed data will be saved
 train_data_write_file = 'train_data_processed.csv'
