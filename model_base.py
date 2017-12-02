@@ -13,6 +13,8 @@ class ModelBase:
     visual_model = None
     model_name = None
 
+    training_history = None
+
     def __init__(self, dictionary : Dictionary, question_maxlen = 20, embedding_vector_length = 300, visual_model=True):
         self.dictionary = dictionary
         self.question_maxlen = question_maxlen
@@ -40,15 +42,17 @@ class ModelBase:
         model = self.get_model(X, Y)
 
         if self.visual_model:
-            history = model.fit([X, X_features], Y, epochs=10, batch_size=64)
+            history = model.fit([X, X_features], Y, epochs=1, batch_size=64)
         else:
             history = model.fit(X, Y, epochs=10, batch_size=64)
+
+        self.training_history = history
 
         if save:
             self.save_model(model, save_name)
             #np.save()
 
-        return model, history
+        return model
 
     def evaluate(self, model : Sequential, test_data_file=test_data_write_file, visualize_results=True, save_predictions=True):
         X, X_features, Y, answers, image_ids = prepare_data(data_folder + test_data_file, self.dictionary, self.question_maxlen)
