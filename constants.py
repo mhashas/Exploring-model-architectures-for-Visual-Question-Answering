@@ -16,7 +16,7 @@ a_val_data_fie = 'vqa_annotatons_valid.gzip'
 predictions_data_file = 'predictions'
 inputs_data_file = 'inputs'
 answers_data_file = 'answers'
-image_ids_data_file = 'image_ids'
+question_ids_data_file = 'question_ids'
 npy_save_type = '.npy'
 
 # where the preprocessed data will be saved

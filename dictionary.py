@@ -41,7 +41,7 @@ class Dictionary:
             data = csv.reader(csv_data, delimiter=self.pp_data.csv_delimiter)
             answers = []
 
-            for (_, question, answer) in data:
+            for (_, _, question, answer) in data:
                 words = question + ' ' + answer
                 answers.append(answer)
 

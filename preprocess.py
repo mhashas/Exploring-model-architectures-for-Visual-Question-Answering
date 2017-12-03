@@ -73,17 +73,18 @@ class Preprocess:
         writeFile = open(write_file, 'w')
 
         for index, question_info in enumerate(q_data['questions']):
-            image_id = question_info['image_id']
+            image_id = str(question_info['image_id'])
             question = question_info['question']
             question = self.format_question(question)
+            question_id = str(a_data['annotations'][index]['question_id'])
 
-            save_variable[image_id] = dict()
-            save_variable[image_id]['question'] = question
-            save_variable[image_id]['annotations'] = a_data['annotations'][index]
-            save_variable[image_id]['image_features'] = self.img_features[self.image_to_visual_feat_mapping[str(image_id)]]
+            save_variable[question_id] = dict()
+            save_variable[question_id]['question'] = question
+            save_variable[question_id]['annotations'] = a_data['annotations'][index]
+            save_variable[question_id]['image_features'] = self.img_features[self.image_to_visual_feat_mapping[str(image_id)]]
 
             features = self.getFeatures(a_data['annotations'][index]['answers'])
-            training_example = str(image_id) + self.csv_delimiter + str(question) + self.csv_delimiter + features
+            training_example = question_id + self.csv_delimiter + image_id + self.csv_delimiter + str(question) + self.csv_delimiter + features
             writeFile.write(training_example + '\n')
 
         writeFile.close()

@@ -21,10 +21,10 @@ def train_and_evaluate(args):
               visual_model=args.visual_model)
 
     if (not args.model_name):
-        model = lstm.train(save=True)
+        model = bow.train(save=True)
     else:
         model = load_model(model_folder + args.model_name)
-    lstm.evaluate(model)
+    bow.evaluate(model)
 
 def visualize_errors(args):
     helper = Preprocess()
@@ -35,7 +35,7 @@ def visualize_errors(args):
     inputs = np.load(data_folder + inputs_data_file + "_" + args.model_type + npy_save_type)
     answers = np.load(data_folder + answers_data_file + "_" + args.model_type + npy_save_type)
     predictions = np.load(data_folder + predictions_data_file + "_" + args.model_type + npy_save_type)
-    image_ids = np.load(data_folder + image_ids_data_file + "_" + args.model_type + npy_save_type)
+    image_ids = np.load(data_folder + question_ids_data_file + "_" + args.model_type + npy_save_type)
 
     analyse_results(inputs, predictions, answers, image_ids, None, dictionary, 0, args.model_type)
 
