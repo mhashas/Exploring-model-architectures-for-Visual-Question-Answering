@@ -32,14 +32,12 @@ def visualize_errors(args):
 
     dictionary = Dictionary(helper, args.max_answers, args.include_question_mark)
 
-    inputs = np.load(data_folder + inputs_data_file)
-    answers = np.load(data_folder + answers_data_file)
-    predictions = np.load(data_folder + predictions_data_file)
+    inputs = np.load(data_folder + inputs_data_file + "_" + args.model_type + npy_save_type)
+    answers = np.load(data_folder + answers_data_file + "_" + args.model_type + npy_save_type)
+    predictions = np.load(data_folder + predictions_data_file + "_" + args.model_type + npy_save_type)
+    image_ids = np.load(data_folder + image_ids_data_file + "_" + args.model_type + npy_save_type)
 
-    #hack for now since I didn't save all the correct data during training
-    _, _, _, _, image_ids = prepare_data(data_folder + test_data_write_file, dictionary)
-
-    analyse_results(inputs, predictions, answers, image_ids, None, dictionary, 0, 'tenpulamea')
+    analyse_results(inputs, predictions, answers, image_ids, None, dictionary, 0, args.model_type)
 
 
 if __name__ == "__main__":
@@ -56,8 +54,9 @@ if __name__ == "__main__":
     parser.add_argument("--dropout", type=float, default=0.2)
     parser.add_argument("--r_dropout", type=float, default=0.2)
     parser.add_argument("--visual_model", type=bool, default=True)
-    parser.add_argument("--only_analyze", type=bool, default=False)
+    parser.add_argument("--only_analyze", type=bool, default=True)
     parser.add_argument("--include_question_mark", type=bool, default=False)
+    parser.add_argument("--model_type", type=str, default="bow")
 
     args = parser.parse_args()
 

@@ -72,11 +72,12 @@ def build_list_of_qpa_dictionaries(inputs, predictions, answers, image_ids, dict
     results = list()
 
     for i in range(N):
-        prediction = predictions[i]
-        prediction_idx = np.argmax(prediction)
+        predictions_for_question = predictions[i]
+        prediction_idx_for_question = np.argmax(predictions_for_question)
 
 
-        answer = answers[i]
+        answer = int(answers[i])
+
         question_embed = inputs[i]
         question = ''
 
@@ -91,12 +92,15 @@ def build_list_of_qpa_dictionaries(inputs, predictions, answers, image_ids, dict
             else:
                 break
 
+        top5predictions = predictions_for_question.argsort()[-5:][::-1]
+
         result = dict()
         result['image_id'] = image_ids[i]
         result['question'] = question
-        result['prediction'] = dictionary.idx2labels[int(prediction_idx)]
+        result['prediction'] = dictionary.idx2labels[int(prediction_idx_for_question)]
         result['answer'] = dictionary.idx2labels[int(answer)]
-        result['correct'] = int(answer) == int(prediction_idx)
+        result['top1'] = int(answer) == int(prediction_idx_for_question)
+        result['top5'] = 1 if answer in top5predictions else 0
 
         results.append(result)
 
