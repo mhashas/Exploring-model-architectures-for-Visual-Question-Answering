@@ -6,7 +6,7 @@ from keras.models import Sequential
 
 class ModelBase:
     question_maxlen = None
-    top_words = None # TODO RADU : rename to more appropriate
+    top_words = None
     embedding_vector_length = None
 
     dictionary = dict()
@@ -51,7 +51,6 @@ class ModelBase:
 
         if save:
             self.save_model(model, save_name)
-            #np.save()
 
         return model
 

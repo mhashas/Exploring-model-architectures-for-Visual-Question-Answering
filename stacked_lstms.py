@@ -16,10 +16,10 @@ class LSTM(ModelBase):
         self.lstm_hidden_units = lstm_hidden_units
         self.dropout = dropout
         self.recurrent_dropout = recurrent_dropout
-        self.model_name = "lstm-question_maxlen=" + str(question_maxlen) + "-embedd_length=" + str(embedding_vector_length) + "-lstm_hidden_units=" \
+        self.model_name = "stacked_lstms-question_maxlen=" + str(question_maxlen) + "-embedd_length=" + str(embedding_vector_length) + "-lstm_hidden_units=" \
                         + str(lstm_hidden_units) +"-dropout=" + str(dropout) + "-recurrent_dropout=" + str(recurrent_dropout)  + \
                           "-visual_model=" + str(visual_model)
-        self.model_type = 'lstm'
+        self.model_type = 'stacked_lstms'
 
 
     def build_visual_model(self, X, Y):
@@ -29,7 +29,11 @@ class LSTM(ModelBase):
 
         language_model = Sequential()
         language_model.add(Embedding(self.top_words, self.embedding_vector_length, input_length=self.question_maxlen))
-        language_model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout)) # discover these parameters?
+        language_model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout, return_sequences=True))
+        language_model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout, return_sequences=True))
+        language_model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout, return_sequences=False))
+
+
         model = Sequential()
         model.add(Merge([language_model, image_model], mode='concat', concat_axis=1))
         model.add(Dense(self.dictionary.max_labels, activation='softmax'))
@@ -41,7 +45,9 @@ class LSTM(ModelBase):
     def build_language_model(self, X, Y):
         model = Sequential()
         model.add(Embedding(self.top_words, self.embedding_vector_length, input_length=self.question_maxlen))
-        model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout))
+        model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout, return_sequences=True))
+        model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout, return_sequences=True))
+        model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout, return_sequences=False))
         model.add(Dense(self.dictionary.max_labels, activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(model.summary())

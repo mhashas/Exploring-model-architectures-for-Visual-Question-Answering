@@ -35,12 +35,6 @@ class BOW(ModelBase):
 
         model = Sequential()
         model.add(Merge([language_model, image_model], mode='concat', concat_axis=1))
-
-        """
-        TODO RADU: dense layers ?? 
-        TODO RADU: dropout_layers ??
-        """
-
         model.add(Dense(self.dictionary.max_labels, activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(model.summary())
