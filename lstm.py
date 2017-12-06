@@ -21,6 +21,7 @@ class LSTM(ModelBase):
         self.model_name = "lstm-question_maxlen=" + str(question_maxlen) + "-embedd_length=" + str(embedding_vector_length) + "-lstm_hidden_units=" \
                         + str(lstm_hidden_units) +"-dropout=" + str(dropout) + "-recurrent_dropout=" + str(recurrent_dropout) + "-deeper_lstm=" + str(deeper_lstm) + \
                           "-visual_model=" + str(visual_model)
+        self.model_type = 'lstm'
 
 
     def build_visual_model(self, X, Y):

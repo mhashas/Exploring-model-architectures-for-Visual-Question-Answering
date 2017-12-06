@@ -12,6 +12,7 @@ class ModelBase:
     dictionary = dict()
     visual_model = None
     model_name = None
+    model_type = None
 
     training_history = None
 
@@ -69,7 +70,7 @@ class ModelBase:
             predictions = model.predict(X)
 
         if visualize_results:
-            analyse_results(X.tolist(), predictions, answers, X_question_ids, model, self.dictionary, acc, self.model_name)
+            analyse_results(X.tolist(), predictions, answers, X_question_ids, model, self.dictionary, acc, self.model_name, self.model_type)
 
     def save_model(self, model : Sequential, model_name):
         model.save(model_folder + model_name, overwrite=True)

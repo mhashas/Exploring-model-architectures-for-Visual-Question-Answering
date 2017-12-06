@@ -4,6 +4,7 @@ import numpy as np
 from keras.utils import np_utils
 from keras.models import Sequential
 from dictionary import Dictionary
+from collections import defaultdict
 
 def prepare_data(file, dictionary : Dictionary, question_max_length=30):
     with open(file) as csv_file:
@@ -53,27 +54,62 @@ def prepare_data(file, dictionary : Dictionary, question_max_length=30):
         return (X_return, X_img_features, Y_return, Y, X_question_id)
 
 
-def analyse_results(inputs, predictions, answers, question_ids, model : Sequential, dictionary : Dictionary, accuracy, model_name):
-    results = build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary, model_name)
-    statistics = get_statistics(results, dictionary)
+def analyse_results(inputs, predictions, answers, question_ids, model : Sequential, dictionary : Dictionary, accuracy, model_name, model_type):
+    results = build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary, model_type)
+    statistics = get_statistics(results)
 
 
 
 
-def get_statistics(results, dictionary):
-    number_of_results = len(results)
-
-    number_of_correct_results = dict()
+def get_statistics(results):
     statistics = dict()
+    statistics['total_number_of_results'] = len(results)
+    statistics['top1'] = 0
+    statistics['top5'] = 0
+
+    statistics['per_type_of_question'] = dict()
+    statistics['answer_type'] = dict()
+
+    statistics['number_of_multiple_choice_questions'] = dict()
+    statistics['number_of_multiple_choice_questions']['total'] = 0
+    statistics['number_of_multiple_choice_questions']['top1'] = 0
+    statistics['number_of_multiple_choice_questions']['top5'] = 0
+
 
     for result in results:
-        print(result)
-        exit(1)
-    return
+        statistics['top1'] += 1 if result['prediction'] == result['answer'] else 0
+        statistics['top5'] += 1 if result['prediction'] in result['top5'] else 0
+
+        if result['question_type'] not in statistics['per_type_of_question'].keys():
+            statistics['per_type_of_question'][result['question_type']]['total'] = 1
+            statistics['per_type_of_question'][result['question_type']]['top1'] = 1 if result['prediction'] == result['answer'] else 0
+            statistics['per_type_of_question'][result['question_type']]['top5'] = 1 if result['prediction'] in result['top5'] else 0
+        else:
+            statistics['per_type_of_question'][result['question_type']]['total'] += 1
+            statistics['per_type_of_question'][result['question_type']]['top1'] += 1 if result['prediction'] == result[
+                'answer'] else 0
+            statistics['per_type_of_question'][result['question_type']]['top5'] += 1 if result['prediction'] in result[
+                'top5'] else 0
+
+        if result['answer_type'] not in statistics['answer_type'].keys():
+            statistics['answer_type'][result['answer_type']] = dict()
+            statistics['answer_type'][result['answer_type']]['total'] = 0
+            statistics['answer_type'][result['answer_type']]['top1'] = 0
+            statistics['answer_type'][result['answer_type']]['top5'] = 0
+
+        statistics['answer_type'][result['answer_type']]['total'] += 1
+        statistics['answer_type'][result['answer_type']]['top1'] += 1 if result['prediction'] == result['answer'] else 0
+        statistics['answer_type'][result['answer_type']]['top5'] += 1 if result['prediction'] in result['top5'] else 0
+
+        statistics['number_of_multiple_choice_questions']['total'] += 1
+        statistics['number_of_multiple_choice_questions']['top1'] += 1 if result['prediction'] == result['answer'] else 0
+        statistics['number_of_multiple_choice_questions']['top5'] += 1 if result['prediction'] in result['top5'] else 0
+
+    return statistics
 
 
 # returns list of dictionaries. Dictionary format is ['img_id', 'question', 'prediction', 'answer', 'correct']
-def build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary : Dictionary, model_name):
+def build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary : Dictionary, model_type):
     N = len(predictions)
     results = list()
 
@@ -117,5 +153,5 @@ def build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, d
 
         results.append(result)
 
-    np.save(data_folder + results_write_file + model_name, results)
+    np.save(data_folder + results_write_file + 'lstm', results)
     return results

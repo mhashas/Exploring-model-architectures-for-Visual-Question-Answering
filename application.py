@@ -26,13 +26,15 @@ def train_and_evaluate(args):
         model = load_model(model_folder + args.model_name)
     lstm.evaluate(model)
 
-def visualize_errors(args):
-    helper = Preprocess()
-    helper.preprocess()
+def plot_statistics(statistics):
+    return
 
-    dictionary = Dictionary(helper, args.max_answers)
-    results = np.load(data_folder + 'dem_results_dont_lie' + npy_save_type)
-    statistics = get_statistics(results, dictionary)
+def visualize_errors(args):
+    results = np.load(data_folder + 'results_lstm_blind.npy')
+    statistics = get_statistics(results)
+    print(statistics)
+    exit(1)
+    plot_statistics(statistics)
 
 
 def debug_that_shit():
@@ -41,7 +43,7 @@ def debug_that_shit():
 
     dictionary = Dictionary(helper, args.max_answers)
 
-    results = np.load(data_folder + 'dem_results_dont_lie' + npy_save_type)
+    results = np.load(data_folder + args.model_name + npy_save_type)
 
     print(results)
     exit(1)
@@ -59,8 +61,8 @@ if __name__ == "__main__":
     parser.add_argument("--deep_lstms", help="if we should use a deep lstm architecture", type=bool, default=False)
     parser.add_argument("--dropout", type=float, default=0.2)
     parser.add_argument("--r_dropout", type=float, default=0.2)
-    parser.add_argument("--visual_model", type=bool, default=False)
-    parser.add_argument("--only_analyze", type=bool, default=False)
+    parser.add_argument("--visual_model", type=bool, default=True)
+    parser.add_argument("--only_analyze", type=bool, default=True)
     parser.add_argument("--model_type", type=str, default="bow")
 
     args = parser.parse_args()
