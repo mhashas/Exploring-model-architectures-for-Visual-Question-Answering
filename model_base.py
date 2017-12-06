@@ -54,7 +54,7 @@ class ModelBase:
 
         return model
 
-    def evaluate(self, model : Sequential, test_data_file=test_data_write_file, visualize_results=True, save_predictions=True):
+    def evaluate(self, model : Sequential, test_data_file=test_data_write_file, visualize_results=True):
         X, X_features, Y, answers, X_question_ids = prepare_data(data_folder + test_data_file, self.dictionary, self.question_maxlen)
 
         if self.visual_model:
@@ -67,13 +67,6 @@ class ModelBase:
             predictions = model.predict([X, X_features])
         else:
             predictions = model.predict(X)
-
-        if save_predictions:
-            model_type = self.model_name.split('-')[0]
-            np.save(data_folder + predictions_data_file + '_' + model_type, predictions)
-            np.save(data_folder + inputs_data_file + '_' + model_type, X.tolist())
-            np.save(data_folder + answers_data_file + '_' + model_type, answers)
-            np.save(data_folder + question_ids_data_file + '_' + model_type, X_question_ids)
 
         if visualize_results:
             analyse_results(X.tolist(), predictions, answers, X_question_ids, model, self.dictionary, acc, self.model_name)

@@ -21,24 +21,30 @@ def train_and_evaluate(args):
               visual_model=args.visual_model)
 
     if (not args.model_name):
-        model = bow.train(save=True)
+        model = lstm.train(save=True)
     else:
         model = load_model(model_folder + args.model_name)
-    bow.evaluate(model)
+    lstm.evaluate(model)
 
 def visualize_errors(args):
     helper = Preprocess()
     helper.preprocess()
 
-    dictionary = Dictionary(helper, args.max_answers, args.include_question_mark)
+    dictionary = Dictionary(helper, args.max_answers)
+    results = np.load(data_folder + 'dem_results_dont_lie' + npy_save_type)
+    statistics = get_statistics(results, dictionary)
 
-    inputs = np.load(data_folder + inputs_data_file + "_" + args.model_type + npy_save_type)
-    answers = np.load(data_folder + answers_data_file + "_" + args.model_type + npy_save_type)
-    predictions = np.load(data_folder + predictions_data_file + "_" + args.model_type + npy_save_type)
-    image_ids = np.load(data_folder + question_ids_data_file + "_" + args.model_type + npy_save_type)
 
-    analyse_results(inputs, predictions, answers, image_ids, None, dictionary, 0, args.model_type)
+def debug_that_shit():
+    helper = Preprocess()
+    helper.preprocess()
 
+    dictionary = Dictionary(helper, args.max_answers)
+
+    results = np.load(data_folder + 'dem_results_dont_lie' + npy_save_type)
+
+    print(results)
+    exit(1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -53,12 +59,13 @@ if __name__ == "__main__":
     parser.add_argument("--deep_lstms", help="if we should use a deep lstm architecture", type=bool, default=False)
     parser.add_argument("--dropout", type=float, default=0.2)
     parser.add_argument("--r_dropout", type=float, default=0.2)
-    parser.add_argument("--visual_model", type=bool, default=True)
-    parser.add_argument("--only_analyze", type=bool, default=True)
-    parser.add_argument("--include_question_mark", type=bool, default=False)
+    parser.add_argument("--visual_model", type=bool, default=False)
+    parser.add_argument("--only_analyze", type=bool, default=False)
     parser.add_argument("--model_type", type=str, default="bow")
 
     args = parser.parse_args()
+
+    #debug_that_shit()
 
     if args.only_analyze:
         visualize_errors(args)

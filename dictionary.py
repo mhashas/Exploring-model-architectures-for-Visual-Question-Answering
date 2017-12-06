@@ -13,16 +13,14 @@ class Dictionary:
     labels2idx = {}
     idx2labels = []
 
-    include_question_mark = None
     pp_data = None # type: Preprocess
     max_labels = None
 
     oov = '<UNK>'
 
-    def __init__(self, preprocessed_data, max_labels = 1000, include_question_mark = False):
+    def __init__(self, preprocessed_data, max_labels = 1000):
         self.pp_data = preprocessed_data # type: Preprocess
         self.max_labels = max_labels
-        self.include_question_mark = include_question_mark
 
         if self.dictionariesAreBuilt():
             self.loadDictionaries()
@@ -47,9 +45,6 @@ class Dictionary:
 
                 for word in re.split(r'[^\w]+', words):
                     lowercase_word = word.lower()
-
-                    if not self.include_question_mark and lowercase_word == '?':
-                        continue
 
                     if lowercase_word not in self.word2idx:
                         index = len(self.idx2word)

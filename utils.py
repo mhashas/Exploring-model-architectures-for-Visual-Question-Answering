@@ -54,7 +54,7 @@ def prepare_data(file, dictionary : Dictionary, question_max_length=30):
 
 
 def analyse_results(inputs, predictions, answers, question_ids, model : Sequential, dictionary : Dictionary, accuracy, model_name):
-    results = build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary)
+    results = build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary, model_name)
     statistics = get_statistics(results, dictionary)
 
 
@@ -65,11 +65,15 @@ def get_statistics(results, dictionary):
 
     number_of_correct_results = dict()
     statistics = dict()
+
+    for result in results:
+        print(result)
+        exit(1)
     return
 
 
 # returns list of dictionaries. Dictionary format is ['img_id', 'question', 'prediction', 'answer', 'correct']
-def build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary : Dictionary):
+def build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary : Dictionary, model_name):
     N = len(predictions)
     results = list()
 
@@ -111,8 +115,7 @@ def build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, d
         result['answer'] = dictionary.idx2labels[int(answer)]
         result['top5'] = [dictionary.idx2labels[int(prediction)] for prediction in top5predictions]
 
-        #get type of question <-
-
         results.append(result)
 
+    np.save(data_folder + results_write_file + model_name, results)
     return results
