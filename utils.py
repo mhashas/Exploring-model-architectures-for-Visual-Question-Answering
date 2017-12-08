@@ -81,6 +81,7 @@ def get_statistics(results):
         statistics['top5'] += 1 if result['prediction'] in result['top5'] else 0
 
         if result['question_type'] not in statistics['per_type_of_question'].keys():
+            statistics['per_type_of_question'][result['question_type']] = dict()
             statistics['per_type_of_question'][result['question_type']]['total'] = 1
             statistics['per_type_of_question'][result['question_type']]['top1'] = 1 if result['prediction'] == result['answer'] else 0
             statistics['per_type_of_question'][result['question_type']]['top5'] = 1 if result['prediction'] in result['top5'] else 0
@@ -153,5 +154,5 @@ def build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, d
 
         results.append(result)
 
-    np.save(data_folder + results_write_file + 'lstm', results)
+    np.save(data_folder + results_write_file + model_type, results)
     return results
