@@ -1,9 +1,8 @@
 *.ipynb
 data/*
-!data/.gitkeep
 hyper_parameter_search_data/
-!hyper_parameter_search/.gitkeep
+!hyper_parameter_search/*.MD
 __pycache__/*
 .idea/*
 models/*
-!models/.gitkeep
+!/.gitkeep

@@ -11,8 +11,10 @@ class LSTM(ModelBase):
     dropout = None
     recurrent_dropout = None
     number_stacked_lstms = None
+    mlp_hidden_units = None
+    adding_mlp = None
 
-    def __init__(self, dictionary : Dictionary, question_maxlen=20, embedding_vector_length=300, visual_model=True, lstm_hidden_units = 512, dropout = 0.2, recurrent_dropout = 0.2, number_stacked_lstms = 0):
+    def __init__(self, dictionary : Dictionary, question_maxlen=20, embedding_vector_length=300, visual_model=True, lstm_hidden_units = 512, dropout = 0.2, recurrent_dropout = 0.2, number_stacked_lstms = 0, adding_mlp = 0, number_mlp_units = 1024):
         super(LSTM, self).__init__(dictionary, question_maxlen, embedding_vector_length, visual_model)
         self.lstm_hidden_units = lstm_hidden_units
         self.dropout = dropout
@@ -20,9 +22,10 @@ class LSTM(ModelBase):
         self.number_stacked_lstms = number_stacked_lstms
         self.model_name = "lstm-q_len=" + str(question_maxlen) + "-embedd_len=" + str(embedding_vector_length) + "-h_units=" \
                         + str(lstm_hidden_units) +"-dr=" + str(dropout) + "-r_dr=" + str(recurrent_dropout)  + \
-                          "-visua=" + str(visual_model) + "-stacked=" + number_stacked_lstms
+                          "-visual=" + str(visual_model) + "-stacked=" + str(number_stacked_lstms) + "-mlp_units=" + str(number_mlp_units)
         self.model_type = 'lstm'
-
+        self.adding_mlp = adding_mlp
+        self.mlp_hidden_units = number_mlp_units
 
     def build_visual_model(self, X, Y):
         image_model = Sequential()
@@ -37,6 +40,10 @@ class LSTM(ModelBase):
 
         language_model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout,
             return_sequences=False))
+
+        if self.adding_mlp:
+            language_model.add(Dense(self.mlp_hidden_units, init='uniform', activation='tanh'))
+            language_model.add(Dropout(self.dropout))
        
         model = Sequential()
         model.add(Merge([language_model, image_model], mode='concat', concat_axis=1))
