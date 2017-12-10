@@ -54,11 +54,12 @@ def prepare_data(file, dictionary : Dictionary, question_max_length=30):
         return (X_return, X_img_features, Y_return, Y, X_question_id)
 
 
-def analyse_results(inputs, predictions, answers, question_ids, model : Sequential, dictionary : Dictionary, accuracy, model_name, model_type):
+def analyse_results(inputs, predictions, answers, question_ids, model : Sequential, dictionary : Dictionary, accuracy, model_name, model_type, save_statistics=False):
     results = build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary, model_type)
     statistics = get_statistics(results)
 
-
+    if save_statistics:
+        np.save(hyper_parameter_folder + 'acc=' + accuracy + ' ' + model_name, statistics)
 
 
 def get_statistics(results):

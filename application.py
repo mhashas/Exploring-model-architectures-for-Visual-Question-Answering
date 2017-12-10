@@ -25,7 +25,7 @@ def train_and_evaluate(args):
               visual_model=args.visual_model)
 
     if (not args.model_name):
-        model = lstm.train(save=True)
+        model = lstm.train(save=True, epochs=args.nr_epocs, batch_size=args.batch_size)
     else:
         model = load_model(model_folder + args.model_name)
         lstm.evaluate(model)

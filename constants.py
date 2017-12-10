@@ -1,6 +1,6 @@
 data_folder = 'data/'
 model_folder = 'models/'
-hyper_parameter = 'hyper_parameter_search_data/'
+hyper_parameter_folder = 'hyper_parameter_search_data/'
 
 # given by project
 h5_file = 'VQA_image_features.h5'

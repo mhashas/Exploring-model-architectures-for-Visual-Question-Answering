@@ -35,7 +35,7 @@ class ModelBase:
         else:
             return self.build_language_model(X,Y)
 
-    def train(self, train_data_file=train_data_write_file, save=False, save_name=''):
+    def train(self, train_data_file=train_data_write_file, save=False, save_name='', epochs=10, batch_size=64, verbose=1):
         save_name = save_name if save_name else self.model_name
 
         X, X_features, Y, _, _ = prepare_data(data_folder + train_data_file, self.dictionary, self.question_maxlen)
@@ -43,9 +43,9 @@ class ModelBase:
         model = self.get_model(X, Y)
 
         if self.visual_model:
-            history = model.fit([X, X_features], Y, epochs=10, batch_size=64)
+            history = model.fit([X, X_features], Y, epochs=epochs, batch_size=batch_size, verbose=verbose)
         else:
-            history = model.fit(X, Y, epochs=10, batch_size=64)
+            history = model.fit(X, Y, epochs=epochs, batch_size=batch_size, verbose=verbose)
 
         self.training_history = history
 
@@ -70,6 +70,8 @@ class ModelBase:
 
         if visualize_results:
             analyse_results(X.tolist(), predictions, answers, X_question_ids, model, self.dictionary, acc, self.model_name, self.model_type)
+
+        return acc
 
     def save_model(self, model : Sequential, model_name):
         model.save(model_folder + model_name, overwrite=True)
