@@ -63,8 +63,13 @@ class Dictionary:
 
 
         sorted_answers = sorted(labels, key=labels.get, reverse=True)
-        #self.idx2labels = sorted_answers[0:self.max_labels - 1]
-        self.idx2labels = sorted_answers
+
+        if str(self.max_labels) == 'all':
+            self.idx2labels = sorted_answers
+        else:
+            self.idx2labels = sorted_answers[0:self.max_labels - 1]
+            self.idx2labels = sorted_answers
+
         self.idx2labels.append(self.oov) # append out of vocabulary word
 
         for i in range(len(self.idx2labels)):
