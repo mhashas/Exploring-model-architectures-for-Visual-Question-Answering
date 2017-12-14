@@ -3,6 +3,7 @@ from bow import BOW
 from lstm import LSTM
 from preprocess import Preprocess
 from dictionary import Dictionary
+from constants import *
 
 def bow_hyperparameter_search(embedding_dims, max_question_lens, max_answers):
     helper = Preprocess()
@@ -16,16 +17,16 @@ def bow_hyperparameter_search(embedding_dims, max_question_lens, max_answers):
                 print('Building model BOW' + '-embedding_dim=' + str(embedding_dim) + '-question_maxlen=' + str(question_maxlen) + '-max_answers=' + str(max_answer))
                 bow = BOW(dictionary, question_maxlen, embedding_dim, visual_model=True)
                 model = bow.train(verbose=2)
-                acc = bow.evaluate(model)
+                acc = bow.evaluate(model, test_data_file=val_data_write_file)
                 print('Model evaluated, acc=' + str(acc))
 
-def lstm_hyperparameter_search(embedding_dim, max_question_len, max_answers, number_hidden_units, dropouts, r_dropouts, number_stacked_lstms):
+def lstm_hyperparameter_search(number_hidden_units, dropouts, number_stacked_lstms, add_mlp, mlp_hidden_units):
     helper = Preprocess()
     helper.preprocess()
-    best_embedding_length_bow = None #tbd
-    best_max_anwers_bow = None #tbd
-    best_question_maxlen_bow = None #Tbd
 
+    best_embedding_length_bow = 300 #tbd
+    best_max_anwers_bow = 500 #tbd
+    best_question_maxlen_bow = 15 #Tbd
 
     dictionary = Dictionary(helper, best_max_anwers_bow)
 
@@ -36,15 +37,17 @@ def lstm_hyperparameter_search(embedding_dim, max_question_len, max_answers, num
                     lstm = None
                     if adding_mlp:
                         for number_mlp_hidden_units in mlp_hidden_units:
-                            print('Building model LSTM-')
+                            print('Building model LSTM-lstm_h_units=' + str(number_h_units) + '-dropout=' + str(dropout) + '-nr_stacked_lstm=' + str(number_stacked_lstm) + 'mlp_hidden_units=' + str(number_mlp_hidden_units))
                             lstm = LSTM(dictionary, question_maxlen=best_question_maxlen_bow, embedding_vector_length=best_embedding_length_bow, lstm_hidden_units=number_h_units, dropout=dropout, recurrent_dropout=dropout, number_stacked_lstms=number_stacked_lstm, adding_mlp=adding_mlp, number_mlp_units=number_mlp_hidden_units)
+                            model = lstm.train(verbose=2, train_data_file=train_data_write_file)
+                            acc = lstm.evaluate(model, test_data_file=val_data_write_file)
+                            print('Model evaluated, acc=' + str(acc))
                     else:
-                        print('Building model LSTM')
+                        print('Building model LSTM-lstm_h_units=' + str(number_h_units) + '-dropout=' + str(dropout) + '-nr_stacked_lstm=' + str(number_stacked_lstm))
                         lstm = LSTM(dictionary, question_maxlen=best_question_maxlen_bow, embedding_vector_length=best_embedding_length_bow, lstm_hidden_units=number_h_units, dropout=dropout, recurrent_dropout=dropout, number_stacked_lstms=number_stacked_lstm, adding_mlp=0)
-
-                    model = lstm.train(verbose=2)
-                    acc = lstm.evaluate(model)
-                    print('Model evaluated, acc=' + str(acc))
+                        model = lstm.train(verbose=2, train_data_file=train_data_write_file)
+                        acc = lstm.evaluate(model, test_data_file=val_data_write_file)
+                        print('Model evaluated, acc=' + str(acc))
 
 
 def training_hyperparameter_search(nr_epoch, batch_size):
@@ -53,18 +56,18 @@ def training_hyperparameter_search(nr_epoch, batch_size):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--parameter_type_search", type=str, default="bow")
+    parser.add_argument("--parameter_type_search", type=str, default="lstm")
 
     args = parser.parse_args()
 
-    max_question_len = [10, 15, 20, 30]
+    max_question_len = [10, 15, 20, 30] # analyze all the questions
     embedding_dim = [200, 300, 400 , 600]
-    max_answers = [500, 1000, 2000, 4000]
+    max_answers = [500, 1000, 2000, 4000, 'all']
 
-    number_hidden_units = [256, 512, 768, 104]
-    dropout = [0.2, 0.3, 0.4, 0.5]
-    number_stacked_lstms = [0, 1, 2 , 3]
-    mlp_hidden_units = [512, 1024,  2048]
+    number_hidden_units = [256, 512, 104]
+    dropout = [0.3, 0.4, 0.5]
+    number_stacked_lstms = [0, 1, 2]
+    mlp_hidden_units = [512, 1024, 2048]
     add_mlp = [0, 1]
 
     nr_epoch = [5, 8, 10]
@@ -73,6 +76,6 @@ if __name__ == "__main__":
     if args.parameter_type_search == 'bow':
         bow_hyperparameter_search(embedding_dim, max_question_len, max_answers)
     elif args.parameter_type_search == 'lstm':
-        lstm_hyperparameter_search(embedding_dim, max_question_len, max_answers, number_hidden_units, dropout, r_dropout, number_stacked_lstms)
+        lstm_hyperparameter_search(number_hidden_units, dropout, number_stacked_lstms, add_mlp, mlp_hidden_units)
     elif args.parameter_type_search == 'train':
         training_hyperparameter_search(nr_epoch, batch_size)

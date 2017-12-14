@@ -21,7 +21,7 @@ class LSTM(ModelBase):
         self.recurrent_dropout = recurrent_dropout
         self.number_stacked_lstms = number_stacked_lstms
         self.model_name = "lstm-q_len=" + str(question_maxlen) + "-embedd_len=" + str(embedding_vector_length) + "-h_units=" \
-                        + str(lstm_hidden_units) +"-dr=" + str(dropout) + "-r_dr=" + str(recurrent_dropout)  + \
+                        + str(lstm_hidden_units) +"-dropo=" + str(dropout) + "-r_dr=" + str(recurrent_dropout)  + \
                           "-visual=" + str(visual_model) + "-stacked=" + str(number_stacked_lstms) + "-mlp_units=" + str(number_mlp_units)
         self.model_type = 'lstm'
         self.adding_mlp = adding_mlp

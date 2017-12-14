@@ -54,12 +54,12 @@ def prepare_data(file, dictionary : Dictionary, question_max_length=30):
         return (X_return, X_img_features, Y_return, Y, X_question_id)
 
 
-def analyse_results(inputs, predictions, answers, question_ids, model : Sequential, dictionary : Dictionary, accuracy, model_name, model_type, save_statistics=False):
+def analyse_results(inputs, predictions, answers, question_ids, model : Sequential, dictionary : Dictionary, accuracy, model_name, model_type, save_statistics=True):
     results = build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary, model_type)
     statistics = get_statistics(results)
 
     if save_statistics:
-        np.save(hyper_parameter_folder + 'acc=' + accuracy + ' ' + model_name, statistics)
+        np.save(hyper_parameter_folder + 'acc=' + str(accuracy) + ' ' + model_name, statistics)
 
 
 def get_statistics(results):
@@ -116,12 +116,15 @@ def build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, d
     results = list()
 
     test_data = dictionary.pp_data.test_data
+    val_data = dictionary.pp_data.val_data
+
+    skipped_questions = 0
 
     for i in range(N):
         predictions_for_question = predictions[i]
         prediction_idx_for_question = np.argmax(predictions_for_question)
 
-        question_id = question_ids[i]
+        question_id = str(question_ids[i])
         answer = int(answers[i])
 
         question_embed = inputs[i]
@@ -139,7 +142,21 @@ def build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, d
                 break
 
         top5predictions = predictions_for_question.argsort()[-5:][::-1]
-        question_info = test_data[question_id]['annotations']
+
+        found_question = False
+
+        if question_id in test_data.keys():
+            found_question = True
+            question_info = test_data[question_id]['annotations']
+
+        elif question_id in val_data.keys():
+            found_question = True
+            question_info = val_data[question_id]['annotations']
+
+        if not found_question:
+            skipped_questions += 1
+            continue
+
 
         result = dict()
 
@@ -156,4 +173,8 @@ def build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, d
         results.append(result)
 
     np.save(data_folder + results_write_file + model_type, results)
+
+    if (skipped_questions != 0):
+        print('SKIPPED QUESTIONS, INVESTIGATE: ' + str(skipped_questions))
+
     return results
