@@ -17,6 +17,7 @@ class Dictionary:
     max_labels = None
 
     oov = '<UNK>'
+    pad = '<PAD>'
 
     def __init__(self, preprocessed_data, max_labels = 1000):
         self.pp_data = preprocessed_data # type: Preprocess
@@ -33,8 +34,11 @@ class Dictionary:
                and os.path.isfile(data_folder + labels2idx_file) and os.path.isfile(data_folder + idx2labels_file)
 
     def generateDictionaries(self, processed_csv, save):
+        self.idx2word.append(self.pad)
+        self.word2idx[self.pad] = 0
         self.idx2word.append(self.oov)
-        self.word2idx[self.oov] = 0
+        self.word2idx[self.oov] = 1
+
         with open(processed_csv, 'r') as csv_data:
             data = csv.reader(csv_data, delimiter=self.pp_data.csv_delimiter)
             answers = []
@@ -59,8 +63,8 @@ class Dictionary:
 
 
         sorted_answers = sorted(labels, key=labels.get, reverse=True)
-        self.idx2labels = sorted_answers[0:self.max_labels - 1]
-        #self.idx2labels = sorted_answers
+        #self.idx2labels = sorted_answers[0:self.max_labels - 1]
+        self.idx2labels = sorted_answers
         self.idx2labels.append(self.oov) # append out of vocabulary word
 
         for i in range(len(self.idx2labels)):
