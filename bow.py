@@ -18,7 +18,7 @@ class BOW(ModelBase):
         model = Sequential()
         model.add(Embedding(self.top_words, self.embedding_vector_length, input_length=self.question_maxlen))
         model.add(Flatten())
-        model.add(Dense(Y.shape[1], activation='softmax')) # parameter for number of classes
+        model.add(Dense(len(self.dictionary.labels2idx), activation='softmax')) # parameter for number of classes
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(model.summary())
 
@@ -35,7 +35,7 @@ class BOW(ModelBase):
 
         model = Sequential()
         model.add(Merge([language_model, image_model], mode='concat', concat_axis=1))
-        model.add(Dense(Y.shape[1], activation='softmax'))
+        model.add(Dense(len(self.dictionary.labels2idx), activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(model.summary())
 

@@ -48,7 +48,7 @@ def prepare_data(file, dictionary : Dictionary, question_max_length=30):
 
         X_return = np.array(X)
         X_img_features = np.array(X_img_features)
-        Y_return = np_utils.to_categorical(Y)
+        Y_return = np_utils.to_categorical(Y, len(dictionary.labels2idx))
 
 
         return (X_return, X_img_features, Y_return, Y, X_question_id)

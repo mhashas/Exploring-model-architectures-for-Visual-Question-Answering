@@ -47,7 +47,7 @@ class LSTM(ModelBase):
        
         model = Sequential()
         model.add(Merge([language_model, image_model], mode='concat', concat_axis=1))
-        model.add(Dense(Y.shape[1], activation='softmax'))
+        model.add(Dense(len(self.dictionary.labels2idx), activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(model.summary())
 
@@ -67,7 +67,7 @@ class LSTM(ModelBase):
 
         model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout,
                              return_sequences=False))
-        model.add(Dense(Y.shape[1], activation='softmax'))
+        model.add(Dense(len(self.dictionary.labels2idx), activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(model.summary())
 
