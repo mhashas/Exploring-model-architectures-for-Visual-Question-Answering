@@ -68,7 +68,6 @@ class Dictionary:
             self.idx2labels = sorted_answers
         else:
             self.idx2labels = sorted_answers[0:self.max_labels - 1]
-            self.idx2labels = sorted_answers
 
         self.idx2labels.append(self.oov) # append out of vocabulary word
 

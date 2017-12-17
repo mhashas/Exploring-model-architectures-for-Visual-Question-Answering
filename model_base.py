@@ -49,6 +49,8 @@ class ModelBase:
 
         self.training_history = history
 
+        #np.save(hyper_parameter_folder + final_model_folder + 'FINAL-LSTM-HISTORY-TRAINING-ACTUAL-VISUAL', history)
+
         if save:
             self.save_model(model, save_name)
 

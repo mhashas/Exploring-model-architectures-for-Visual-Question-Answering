@@ -70,7 +70,7 @@ class LSTM(ModelBase):
             language_model.add(Dense(self.mlp_hidden_units, init='uniform', activation='tanh'))
             language_model.add(Dropout(self.dropout))
 
-        language_model.add(Dense(self.dictionary.max_labels, activation='softmax'))
+        language_model.add(Dense(len(self.dictionary.labels2idx), activation='softmax'))
         language_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(language_model.summary())
 

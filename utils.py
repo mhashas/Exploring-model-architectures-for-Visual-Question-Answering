@@ -56,10 +56,10 @@ def prepare_data(file, dictionary : Dictionary, question_max_length=30):
 
 def analyse_results(inputs, predictions, answers, question_ids, model : Sequential, dictionary : Dictionary, accuracy, model_name, model_type, save_statistics=True):
     results = build_list_of_qpa_dictionaries(inputs, predictions, answers, question_ids, dictionary, model_type)
-    statistics = get_statistics(results)
+    #statistics = get_statistics(results)
 
     if save_statistics:
-        np.save(hyper_parameter_folder + 'acc=' + str(accuracy) + ' ' + model_name, statistics)
+        np.save(hyper_parameter_folder + final_model_folder + 'FINAL-LSTM-BOW-acc=' + str(accuracy) + ' ' + model_name, results)
 
 
 def get_statistics(results):
