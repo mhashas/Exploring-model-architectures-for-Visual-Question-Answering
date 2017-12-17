@@ -59,7 +59,7 @@ def analyse_results(inputs, predictions, answers, question_ids, model : Sequenti
     #statistics = get_statistics(results)
 
     if save_statistics:
-        np.save(hyper_parameter_folder + final_model_folder + 'FINAL-LSTM-BOW-acc=' + str(accuracy) + ' ' + model_name, results)
+        np.save(hyper_parameter_folder + final_model_folder + 'FINAL-VISUAL-LSTM-BOW-acc=' + str(accuracy) + ' ' + model_name, results)
 
 
 def get_statistics(results):

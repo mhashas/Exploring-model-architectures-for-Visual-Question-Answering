@@ -48,8 +48,20 @@ def lstm_hyperparameter_search(number_hidden_units, dropouts, number_stacked_lst
 
 
 def training_hyperparameter_search(nr_epoch, batch_size):
-    return
+    best_embedding_length_bow = 300 #tbd
+    best_max_anwers_bow = 500 #tbd
+    best_question_maxlen_bow = 15 #Tbd
 
+    helper = Preprocess()
+    helper.preprocess()
+    dictionary = Dictionary(helper, best_max_anwers_bow)
+
+    for epoch in nr_epoch:
+        for batch_size in batch_size:
+            bow = BOW(dictionary, best_question_maxlen_bow, best_embedding_length_bow, visual_model=True)
+            model = bow.train(verbose=2, train_data_file=train_data_write_file, epochs=epoch, batch_size=batch_size)
+            acc = bow.evaluate(model, test_data_file=val_data_write_file)
+            print('Model evaluated, acc=' + str(acc))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -35,8 +35,53 @@ def plot_statistics(statistics):
     return
 
 def visualize_errors(args):
-    results = np.load(hyper_parameter_folder + final_model_folder +  'FINAL-MODEL-BOW-acc=0.379810938565 lstm-q_len=15-embedd_len=300-h_units=512-dropo=0.2-r_dr=0.2-visual=True-stacked=0-mlp_units=1024.npy')
-    statistics = get_statistics(results)
+    results_bow = np.load(hyper_parameter_folder + final_model_folder +  'FINAL-MODEL-BOW-acc=0.384199864966 bow-question_maxlen=15-embedd_length=300-visual_model=True.npy')
+    results_lstm = np.load('mata', 'incur')
+
+    only_bow = []
+    only_lstm = []
+    both_correct = []
+    both_wrong = []
+
+    for result, index in range(results_lstm):
+        result_lstm = results_lstm[index]
+        result_bow = results_bow[index]
+
+        if str(result_lstm['answer']) == str(result_lstm['prediction']) and str(result_bow['answer']) != str(result_bow['prediction']): #same question
+            to_push = dict()
+            to_push['img_id'] = result_lstm['image_id']
+            to_push['predicted_lstm'] = result_lstm['prediction']
+            to_push['predicted_bow'] = result_bow['[prediction']
+            only_lstm.append(to_push)
+
+        if str(result_lstm['answer']) != str(result_lstm['prediction']) and str(result_bow['answer']) == str(result_bow['prediction']): #same question
+            to_push = dict()
+            to_push['img_id'] = result_lstm['image_id']
+            to_push['predicted_lstm'] = result_lstm['prediction']
+            to_push['predicted_bow'] = result_bow['[prediction']
+            only_bow.append(to_push)
+
+        if str(result_lstm['answer']) == str(result_lstm['prediction']) and str(result_bow['answer']) == str(result_bow['prediction']):  # same question
+            to_push = dict()
+            to_push['img_id'] = result_lstm['image_id']
+            to_push['predicted_lstm'] = result_lstm['prediction']
+            to_push['predicted_bow'] = result_bow['[prediction']
+            both_correct.append(to_push)
+
+
+        if str(result_lstm['answer']) != str(result_lstm['prediction']) and str(result_bow['answer']) != str(result_bow['prediction']):  # same question
+            to_push = dict()
+            to_push['img_id'] = result_lstm['image_id']
+            to_push['predicted_lstm'] = result_lstm['prediction']
+            to_push['predicted_bow'] = result_bow['[prediction']
+            both_wrong.append(to_push)
+
+    print(only_lstm)
+    print(only_bow)
+    print(both_correct)
+    print(both_wrong)
+    exit(1)
+    #statistics = get_statistics(results)
     print(statistics)
     exit(1)
     plot_statistics(statistics)
@@ -54,8 +99,8 @@ if __name__ == "__main__":
     parser.add_argument("--number_mlp_unts", help="number_mlp_units", default=512, type=int)
     parser.add_argument("--dropout", type=float, default=0.2)
     parser.add_argument("--r_dropout", type=float, default=0.2)
-    parser.add_argument("--visual_model", type=bool, default=False)
-    parser.add_argument("--only_analyze", type=bool, default=True)
+    parser.add_argument("--visual_model", type=bool, default=True)
+    parser.add_argument("--only_analyze", type=bool, default=False)
     parser.add_argument("--number_stacked_lstms", type=int, default=0)
     parser.add_argument("--model_type", type=str, default="bow")
 
