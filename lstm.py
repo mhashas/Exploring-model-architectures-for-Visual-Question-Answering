@@ -47,7 +47,7 @@ class LSTM(ModelBase):
        
         model = Sequential()
         model.add(Merge([language_model, image_model], mode='concat', concat_axis=1))
-        model.add(Dense(self.dictionary.max_labels, activation='softmax'))
+        model.add(Dense(len(self.dictionary.labels2idx), activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         print(model.summary())
 
