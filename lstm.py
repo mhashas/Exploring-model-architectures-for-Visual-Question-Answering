@@ -54,21 +54,24 @@ class LSTM(ModelBase):
         return model
 
     def build_language_model(self, X, Y):
-        model = Sequential()
-        model.add(Embedding(self.top_words, self.embedding_vector_length, input_length=self.question_maxlen))
+        language_model = Sequential()
+        language_model.add(Embedding(self.top_words, self.embedding_vector_length, input_length=self.question_maxlen))
 
+        for i in range(self.number_stacked_lstms - 1):
+            language_model.add(
+                keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout,
+                           return_sequences=True))
 
-        if not self.number_stacked_lstms:
-            model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout))
-        else:
-            for i in range(self.number_stacked_lstms - 1):
-                model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout,
-                               return_sequences=True))
+        language_model.add(
+            keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout,
+                       return_sequences=False))
 
-        model.add(keras_lstm(self.lstm_hidden_units, dropout=self.dropout, recurrent_dropout=self.recurrent_dropout,
-                             return_sequences=False))
-        model.add(Dense(self.dictionary.max_labels, activation='softmax'))
-        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        print(model.summary())
+        if self.adding_mlp:
+            language_model.add(Dense(self.mlp_hidden_units, init='uniform', activation='tanh'))
+            language_model.add(Dropout(self.dropout))
 
-        return model
+        language_model.add(Dense(self.dictionary.max_labels, activation='softmax'))
+        language_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        print(language_model.summary())
+
+        return language_model
